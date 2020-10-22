@@ -12,10 +12,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 import time
 
-
 threadPool = QtCore.QThreadPool()
 
-class MainWindow() :
+
+class MainWindow():
 
     def __init__(self, qMainWindow):
         self.qMainWindow = qMainWindow
@@ -23,18 +23,25 @@ class MainWindow() :
         self.ui.setupUi(self.qMainWindow)
 
         self.ui.ViewHisButton_2.clicked.connect(self.countdown)
-
+        self.ui.ViewHisButton_2.clicked.connect(self.countup)
+        print("BELLO")
 
     # timefuction
     def countdown(self):
-        countWorker = CountdownWorker(self.ui.Countdowner, 10)
+        countWorker = CountdownWorker(self.ui.Countdowner, 5)
         threadPool.start(countWorker)
+        print("AELLO")
+
+    def countup(self):
+        count_up = CountUpWorker(self.ui.TimerCock, 1)
+        threadPool.start(count_up)
+        print("CELLO")
 
 
 class Ui_MainWindow(object):
 
     def __init__(self):
-        self.gs =  30 * 60
+        self.gs = 30 * 60
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -181,43 +188,59 @@ class Ui_MainWindow(object):
         self.ExitButton.setText(_translate("MainWindow", "ออกจากระบบ"))
 
 
-
-
 class CountdownWorker(QtCore.QRunnable):
 
-    def __init__(self, CountDowner,countdown_time, *args, **kwargs):
+    def __init__(self, CountDowner, countdown_time, *args, **kwargs):
         super(CountdownWorker, self).__init__()
 
         self.Countdowner = CountDowner
         self.countdown_time = countdown_time
 
-
-
     def run(self) -> None:
-        while self.countdown_time :
-
+        while self.countdown_time:
             mins, secs = divmod(self.countdown_time, 60)
-            timer = '{:02d}:{:02d}'.format(mins, secs)
+            hour, mins = divmod(mins, 60)
+            timer = '{:02d}:{:02d}:{:02d}'.format(hour, mins, secs)
             self.Countdowner.setText(timer)
             time.sleep(1)
-            self.countdown_time -=1
+            self.countdown_time -= 1
 
         print("HELL", self.countdown_time)
         mins, secs = divmod(self.countdown_time, 60)
-        timer = '{:02d}:{:02d}'.format(mins, secs)
-        msg = QMessageBox()
-        msg.setText("Hello!!!")
+        timer = '{:02d}:{:02d}:{:02d}'.format(hour, mins, secs)
+        print("O")
 
         self.Countdowner.setText(timer)
 
 
+class CountUpWorker(QtCore.QRunnable):
+
+    def __init__(self, Timer_Cock, countup_time, *args, **kwargs):
+        super(CountUpWorker, self).__init__()
+
+        self.TimerCock = Timer_Cock
+        self.countup_time = countup_time
+
+    def run(self) -> None:
+        while self.countup_time:
+            minss, secss = divmod(self.countup_time, 60)
+            hours, minss = divmod(minss, 60)
+            timerup = '{:02d}:{:02d}:{:02d}'.format(hours, minss, secss)
+            self.TimerCock.setText(timerup)
+            time.sleep(1)
+            self.countup_time += 1
+
+        self.TimerCock.setText(timerup)
+        print("EELLO")
+
+
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     qMainWindow = QtWidgets.QMainWindow()
 
     mainWindow = MainWindow(qMainWindow)
-
 
     qMainWindow.show()
     sys.exit(app.exec_())
